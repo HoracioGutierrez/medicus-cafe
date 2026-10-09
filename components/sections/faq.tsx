@@ -46,18 +46,18 @@ const FAQS = [
 
 export function Faq() {
   return (
-    <section id="faq" className="px-4 py-20 sm:py-28">
+    <section id="faq" className="px-4 py-28 sm:py-36">
       <div className="mx-auto max-w-3xl">
         <Reveal>
-          <h2 className="max-w-[680px] text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="max-w-[560px] text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Questions before you come by
           </h2>
         </Reveal>
 
-        <div className="mt-10 divide-y divide-border rounded-2xl border border-border">
+        <div className="mt-14 divide-y divide-border border-t border-border">
           {FAQS.map((faq, index) => (
             <Reveal key={faq.question} delay={Math.min(index * 0.04, 0.2)}>
-              <details className="group px-6 py-5 open:pb-5">
+              <details className="group py-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                   {faq.question}
                   <CaretDown
@@ -65,7 +65,9 @@ export function Faq() {
                     className="shrink-0 text-foreground-faint transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:rotate-180"
                   />
                 </summary>
-                <p className="mt-3 text-sm leading-6 text-foreground-muted">{faq.answer}</p>
+                <p className="mt-3 max-w-[60ch] text-sm leading-6 text-foreground-muted">
+                  {faq.answer}
+                </p>
               </details>
             </Reveal>
           ))}
