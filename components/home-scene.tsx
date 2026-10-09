@@ -108,6 +108,7 @@ export function HomeScene() {
     scene.add(world);
 
     const CAN_HEIGHT = 3.62;
+    const Y_SHIFT = -0.3;
     const INTRO_LABEL_YAW = THREE.MathUtils.degToRad(10);
     const INGREDIENTS_PANEL = {
       x: 70,
@@ -166,7 +167,7 @@ export function HomeScene() {
       }),
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -2.16;
+    floor.position.y = -2.16 + Y_SHIFT;
     floor.receiveShadow = true;
     scene.add(floor);
 
@@ -484,7 +485,7 @@ export function HomeScene() {
       const compact = innerWidth < 760;
       const spread = compact ? 2.62 : 2.78;
       const introX = centered * spread;
-      const introY = -0.45 + Math.cos(centered * 0.8) * 0.38;
+      const introY = -0.45 + Y_SHIFT + Math.cos(centered * 0.8) * 0.38;
       const introZ = -Math.abs(centered) * 0.2;
       const introRotZ = centered * -0.13;
       const introRotX = Math.sin(centered * 0.9) * 0.14;
@@ -505,7 +506,7 @@ export function HomeScene() {
       const finalSpread = compact ? 2.05 : 2.55;
       const finalX = rememberedCentered * finalSpread;
       const finalY =
-        -0.72 + Math.abs(rememberedCentered) * (compact ? 0.14 : 0.1);
+        -0.72 + Y_SHIFT + Math.abs(rememberedCentered) * (compact ? 0.14 : 0.1);
       const finalRotZ = rememberedCentered * 0.055;
       const logoForwardRotation =
         can.userData.frontRotation +
@@ -513,7 +514,7 @@ export function HomeScene() {
         Math.sin(index * 1.7) * 0.025;
 
       let x = isHero ? lerp(introX, focusHeroX, focusIn) : outerX;
-      let y = isHero ? lerp(introY, -0.1, focusIn) : outerY;
+      let y = isHero ? lerp(introY, -0.1 + Y_SHIFT, focusIn) : outerY;
       let z = isHero ? lerp(introZ, focusDepth, focusIn) : introZ - focusIn * 3;
       let scale = isHero ? lerp(1, focusScale, focusIn) : lerp(1, 0.7, focusIn);
       let rotX = introRotX;
@@ -840,8 +841,8 @@ export function HomeScene() {
       const focusPresence =
         smoothstep(0.18, 0.38, scrollCurrent) * (1 - smoothstep(0.68, 0.86, scrollCurrent));
       const finalePresence = smoothstep(0.74, 0.9, scrollCurrent);
-      const restingFloorY = lerp(-2.16, -2.55, finalePresence);
-      floor.position.y = lerp(restingFloorY, -2.92, focusPresence);
+      const restingFloorY = lerp(-2.16 + Y_SHIFT, -2.55 + Y_SHIFT, finalePresence);
+      floor.position.y = lerp(restingFloorY, -2.92 + Y_SHIFT, focusPresence);
       heroSpot.intensity = lerp(lerp(255, 340, focusPresence), 195, ingredientsPresence);
 
       renderer.render(scene, camera);
