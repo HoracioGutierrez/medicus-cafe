@@ -9,6 +9,8 @@ const palette = [
   {
     name: "COCA-COLA",
     label: "Coca-Cola",
+    era: "circa 1960",
+    description: "La primera que llegó al mostrador, con la receta de siempre.",
     calories: "140",
     ingredients:
       "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
@@ -17,6 +19,8 @@ const palette = [
   {
     name: "7UP",
     label: "7UP",
+    era: "circa 1965",
+    description: "La de las tardes de domingo sin fútbol por la radio.",
     calories: "140",
     ingredients:
       "CARBONATED WATER · SUGAR · CITRIC ACID · LEMON AND LIME FLAVORS",
@@ -25,6 +29,8 @@ const palette = [
   {
     name: "DR-PEPPER",
     label: "Dr Pepper",
+    era: "circa 1970",
+    description: "La trajo un marinero y nunca volvió a buscarla.",
     calories: "150",
     ingredients:
       "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
@@ -33,6 +39,8 @@ const palette = [
   {
     name: "SPRITE",
     label: "Sprite",
+    era: "circa 1972",
+    description: "La que pide todo el que jura que no toma gaseosa.",
     calories: "140",
     ingredients:
       "CARBONATED WATER · SUGAR · CITRIC ACID · NATURAL LEMON-LIME FLAVORS",
@@ -41,6 +49,8 @@ const palette = [
   {
     name: "FANTA",
     label: "Fanta",
+    era: "circa 1975",
+    description: "Naranja como el atardecer que se ve desde la vereda.",
     calories: "160",
     ingredients:
       "CARBONATED WATER · SUGAR · ORANGE JUICE · CITRIC ACID · NATURAL FLAVORS",
@@ -49,6 +59,8 @@ const palette = [
   {
     name: "PEPSI",
     label: "Pepsi",
+    era: "circa 1980",
+    description: "La eterna segunda opción, aunque acá nadie discute gustos.",
     calories: "150",
     ingredients:
       "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
@@ -56,7 +68,9 @@ const palette = [
   },
   {
     name: "MTN-DEW",
-    label: "MTN Dew",
+    label: "Mtn Dew",
+    era: "circa 1985",
+    description: "Llegó con los pibes del rock y se quedó para siempre.",
     calories: "170",
     ingredients:
       "CARBONATED WATER · SUGAR · CITRUS FLAVOR · NATURAL FLAVORS · CAFFEINE",
@@ -81,7 +95,18 @@ export function HomeScene() {
     const carouselCurrentLabel = document.querySelector<HTMLElement>(
       "[data-carousel-current]",
     );
-    if (!canvas || !boot || !carouselControls || !carouselCurrentLabel) {
+    const carouselEra = document.querySelector<HTMLElement>("[data-carousel-era]");
+    const carouselDescription = document.querySelector<HTMLElement>(
+      "[data-carousel-description]",
+    );
+    if (
+      !canvas ||
+      !boot ||
+      !carouselControls ||
+      !carouselCurrentLabel ||
+      !carouselEra ||
+      !carouselDescription
+    ) {
       return;
     }
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -468,7 +493,7 @@ export function HomeScene() {
       (error) => {
         console.error("Could not load the soda-can model.", error);
         const mark = boot.querySelector(".boot__mark");
-        if (mark) mark.textContent = "MODEL ERROR";
+        if (mark) mark.textContent = "ERROR AL CARGAR";
       },
     );
 
@@ -556,6 +581,7 @@ export function HomeScene() {
       const opacityOut = isHero ? 1 : 1 - smoothstep(0.24, 0.34, progress);
       const opacityBack = smoothstep(0.74, 0.9, progress);
       can.visible = Math.max(opacityOut, opacityBack) > 0.02;
+      const landingBrightness = lerp(0.38, 1, smoothstep(0, 0.5, progress));
       can.traverse((child) => {
         const mesh = child as THREE.Mesh;
         if (!mesh.isMesh || !mesh.material) return;
@@ -564,6 +590,13 @@ export function HomeScene() {
           if (material.userData.baseOpacity === undefined) {
             material.userData.baseOpacity = material.opacity;
           }
+          const coloredMaterial = material as THREE.MeshStandardMaterial;
+          if (!material.userData.baseColor) {
+            material.userData.baseColor = coloredMaterial.color.clone();
+          }
+          coloredMaterial.color
+            .copy(material.userData.baseColor)
+            .multiplyScalar(landingBrightness);
           if (child.userData.isSleeve) {
             const physical = material as THREE.MeshPhysicalMaterial;
             physical.roughness = lerp(0.28, 0.43, ingredientsFocus);
@@ -629,6 +662,8 @@ export function HomeScene() {
       if (nextIndex === selectedIndex) return;
       selectedIndex = nextIndex;
       carouselCurrentLabel.textContent = palette[selectedIndex].label;
+      carouselEra.textContent = palette[selectedIndex].era;
+      carouselDescription.textContent = palette[selectedIndex].description;
     };
 
     function updateCarousel(direction: number) {
@@ -899,7 +934,7 @@ export function HomeScene() {
           type="button"
           className="carousel-control carousel-control--previous"
           data-carousel-direction="1"
-          aria-label="Previous can"
+          aria-label="Lata anterior"
         >
           ‹
         </button>
@@ -907,15 +942,23 @@ export function HomeScene() {
           type="button"
           className="carousel-control carousel-control--next"
           data-carousel-direction="-1"
-          aria-label="Next can"
+          aria-label="Lata siguiente"
         >
           ›
         </button>
         <p className="carousel-hint">
           <i aria-hidden="true" />
-          <span className="carousel-current" data-carousel-current>
-            {palette[CAROUSEL_ORIGIN].label}
+          <span className="carousel-meta">
+            <span className="carousel-current" data-carousel-current>
+              {palette[CAROUSEL_ORIGIN].label}
+            </span>
+            <span className="carousel-era" data-carousel-era>
+              {palette[CAROUSEL_ORIGIN].era}
+            </span>
           </span>
+        </p>
+        <p className="carousel-description" data-carousel-description>
+          {palette[CAROUSEL_ORIGIN].description}
         </p>
       </div>
 
@@ -923,10 +966,10 @@ export function HomeScene() {
         <section className="chapter chapter--intro">
           <h1 className="display display--intro">
             <span className="display__line" data-depth="0.06">
-              SAME SHELF
+              MISMA ESTANTERÍA
             </span>
             <span className="display__line display__line--italic" data-depth="-0.04">
-              same stories
+              las mismas historias
             </span>
           </h1>
         </section>
@@ -934,31 +977,34 @@ export function HomeScene() {
         <section className="chapter chapter--focus">
           <div className="focus-copy">
             <h2 className="display display--focus">
-              LOOK CLOSER
+              MIRÁ DE CERCA
               <br />
-              <em>read the label</em>
+              <em>leé la etiqueta</em>
             </h2>
             <p>
-              Every can on this shelf has sat here longer than most regulars
-              have had their usual seat. Spin it around — the ingredients
-              haven&apos;t changed since the day it arrived.
+              Cada lata de esta estantería lleva más tiempo acá que muchos
+              parroquianos en su mesa de siempre. Dale una vuelta — los
+              ingredientes no cambiaron desde el día que llegó.
             </p>
           </div>
         </section>
 
         <section className="chapter chapter--burst">
           <h2 className="burst-title">
-            <span>STILL COLD</span>
-            <span>still here</span>
+            <span>SIGUEN FRÍAS</span>
+            <span>siguen acá</span>
           </h2>
         </section>
 
         <section className="chapter chapter--finale">
           <div className="finale-copy">
-            <h2>VISIT THE SHELF</h2>
+            <h2>
+              VISITÁ LA <span className="text-clay">ESTANTERÍA</span>
+            </h2>
             <p>
-              Open from seven in the morning to the last regular out the
-              door. Come see the cans for yourself.
+              Abrimos desde las siete de la mañana hasta que se apaga la
+              última luz. Vení, sentate con nosotros, y escuchá alguna de
+              estas historias con un cafecito en la mano.
             </p>
           </div>
         </section>
@@ -971,8 +1017,8 @@ export function HomeScene() {
       </div>
 
       <footer>
-        <p>MEDICUS — EST. 1962</p>
-        <p className="footer-credit">A SHELF OF STORIES</p>
+        <p>MEDICUS — DESDE 1962</p>
+        <p className="footer-credit">UNA ESTANTERÍA DE HISTORIAS</p>
       </footer>
     </>
   );

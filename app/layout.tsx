@@ -2,20 +2,20 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Medicus — The Shelf",
+  title: "Medicus — Un bar de siempre",
   description:
-    "An old corner bar where the wall of cans tells sixty years of regulars' stories.",
+    "Un bar de barrio en Buenos Aires donde las bufandas y los banderines cuelgan del techo y la pared de latas cuenta sesenta años de historias de parroquianos.",
   openGraph: {
-    title: "Medicus — The Shelf",
+    title: "Medicus — Un bar de siempre",
     description:
-      "An old corner bar where the wall of cans tells sixty years of regulars' stories.",
+      "Un bar de barrio en Buenos Aires donde las bufandas y los banderines cuelgan del techo y la pared de latas cuenta sesenta años de historias de parroquianos.",
     type: "website",
   },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>{children}</body>
     </html>
   );
