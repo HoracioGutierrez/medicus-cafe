@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Medicus Café
 
-## Getting Started
+Landing page para Medicus, un bar-café clásico de Buenos Aires: paredes cubiertas de banderines y bufandas de fútbol, y una estantería repleta de latas y botellas de gaseosas de todas las épocas. El sitio pone esa estantería en el centro de la experiencia con un carrusel de latas en 3D que reacciona al scroll.
 
-First, run the development server:
+**Demo en vivo:** https://medicusresto.vercel.app
+
+## Stack
+
+- [Next.js 16](https://nextjs.org) (App Router, Turbopack)
+- [Three.js](https://threejs.org) para la escena 3D (carga de modelo GLTF, texturas de canvas generadas en runtime para las etiquetas de cada lata)
+- TypeScript + React 19
+- Desplegado en [Vercel](https://vercel.com)
+
+## La escena 3D
+
+Todo el carrusel vive en `components/home-scene.tsx`: un único componente cliente que monta una escena de Three.js (cámara, luces, el modelo de la lata, texturas de sleeve dibujadas a mano en un `<canvas>`) y la sincroniza con el scroll de la página. El progreso de scroll controla la posición/rotación de cada lata, el fundido de las luces y un oscurecimiento del brillo de las latas al llegar a la página que se disipa a medida que el usuario avanza.
+
+## Desarrollo local
+
+Este proyecto usa [Bun](https://bun.sh) como gestor de paquetes.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrí [http://localhost:3000](http://localhost:3000) para verlo.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Otros scripts:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+bun run build   # build de producción
+bun run start   # sirve el build de producción
+bun run lint    # eslint
+```
 
-## Learn More
+## Estructura
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/                  App Router: layout, page y estilos globales
+components/
+  home-scene.tsx       Escena 3D + markup de toda la landing
+public/
+  models/              Modelo GLTF de la lata
+  brands/              Texturas de las etiquetas
+  backgrounds/         Fondo fotográfico de la estantería
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+vercel deploy --prod
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El proyecto está linkeado a `horacio-gutierrez-s-projects/medicusresto` en Vercel.
