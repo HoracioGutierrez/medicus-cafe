@@ -34,7 +34,7 @@ const BENEFITS = [
 export function Benefits() {
   return (
     <section id="benefits" className="px-4 py-28 sm:py-36">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <h2 className="max-w-[560px] text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             What's actually on the shelf

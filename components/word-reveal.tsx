@@ -23,7 +23,9 @@ export function WordReveal({
           if (entry.isIntersecting) {
             entry.target.classList.add("opacity-100");
             entry.target.classList.remove("opacity-30");
-            observer.unobserve(entry.target);
+          } else {
+            entry.target.classList.add("opacity-30");
+            entry.target.classList.remove("opacity-100");
           }
         }
       },

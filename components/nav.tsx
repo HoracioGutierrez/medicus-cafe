@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
 
 const LINKS = [
-  { href: "#benefits", label: "The shelf" },
   { href: "#visit", label: "Visiting" },
   { href: "#proof", label: "Regulars" },
   { href: "#faq", label: "FAQ" },
@@ -22,7 +21,7 @@ export function Nav() {
 
   return (
     <header className="relative z-50 border-b border-border/60">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-4 sm:px-6">
         <a href="#main-content" className="flex items-baseline gap-2 leading-none">
           <span className="font-script text-3xl text-gold">Medicus</span>
           <span className="text-xs font-medium tracking-[0.2em] text-foreground-faint uppercase">
@@ -43,12 +42,6 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#reserve"
-            className="hidden rounded-full bg-ember px-4 py-2 text-sm font-semibold text-foreground transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.03] hover:bg-ember-bright active:scale-[0.98] md:inline-block"
-          >
-            Reserve a table
-          </a>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

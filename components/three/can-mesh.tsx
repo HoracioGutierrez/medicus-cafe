@@ -7,7 +7,7 @@ import { getCanGeometry } from "./can-geometry";
 import "./can-material";
 import type { CanEntry } from "@/lib/cans-data";
 
-const SPACING = 1.3;
+const SPACING = 1.6;
 const BACKGROUND_COLOR = new THREE.Color("#131209");
 
 type CanMaterialImpl = THREE.ShaderMaterial & {
@@ -38,7 +38,7 @@ export function CanMesh({
     const distance = index - offsetRef.current;
     const absDistance = Math.abs(distance);
 
-    const scale = THREE.MathUtils.clamp(1.55 - absDistance * 0.42, 0.22, 1.55);
+    const scale = THREE.MathUtils.clamp(1.85 - absDistance * 0.5, 0.2, 1.85);
     const targetX = distance * SPACING;
     const targetZ = -absDistance * 1.05;
     const targetRotY = THREE.MathUtils.clamp(-distance * 0.5, -1.1, 1.1);
@@ -52,12 +52,12 @@ export function CanMesh({
 
     // Falls off faster than linear so outer cans fade to the background
     // color well before they would otherwise be clipped by the canvas edge.
-    const falloff = Math.pow(THREE.MathUtils.clamp(absDistance / 2.1, 0, 1), 1.6);
+    const falloff = Math.pow(THREE.MathUtils.clamp(absDistance / 1.75, 0, 1), 1.6);
     const targetFocus = THREE.MathUtils.clamp(1 - falloff, 0, 1);
     material.uFocus = THREE.MathUtils.damp(material.uFocus, targetFocus, 7, delta);
     material.uTime = state.clock.elapsedTime;
 
-    mesh.visible = absDistance < 2.3;
+    mesh.visible = absDistance < 1.9;
   });
 
   return (

@@ -3,15 +3,15 @@ import { CanCarousel } from "@/components/three/can-carousel";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative flex min-h-[100dvh] items-center overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-45"
           style={{
             maskImage:
-              "radial-gradient(ellipse 65% 60% at 28% 42%, black 0%, transparent 72%)",
+              "radial-gradient(ellipse 65% 60% at 72% 42%, black 0%, transparent 72%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse 65% 60% at 28% 42%, black 0%, transparent 72%)",
+              "radial-gradient(ellipse 65% 60% at 72% 42%, black 0%, transparent 72%)",
           }}
         >
           <Image
@@ -26,12 +26,8 @@ export function Hero() {
         <div className="absolute inset-0 bg-background/55" />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:py-28">
-        <div className="order-1 flex justify-center lg:justify-start">
-          <CanCarousel />
-        </div>
-
-        <div className="order-2 flex flex-col items-start text-left">
+      <div className="relative mx-auto grid w-full max-w-[1400px] grid-cols-1 items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:gap-10">
+        <div className="order-2 flex flex-col items-start text-left lg:order-1">
           <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-background-raised/60 px-3 py-1 font-mono text-xs font-medium text-foreground-muted">
             Chacarita, Buenos Aires · open since 1962
           </span>
@@ -61,7 +57,7 @@ export function Hero() {
               Reserve a table
             </a>
             <a
-              href="#benefits"
+              href="#visit"
               className="rounded-full border border-border px-5 py-3 text-base font-semibold text-foreground-muted transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-foreground-faint hover:text-foreground"
             >
               See the shelf
@@ -71,6 +67,10 @@ export function Hero() {
           <p className="mt-6 font-mono text-sm text-foreground-faint">
             4,312 cans on the shelf, added by regulars since 1962
           </p>
+        </div>
+
+        <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
+          <CanCarousel />
         </div>
       </div>
     </section>

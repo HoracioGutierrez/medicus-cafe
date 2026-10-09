@@ -1,43 +1,106 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { AnimatePresence, motion } from "framer-motion";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import * as THREE from "three";
 import { CanScene } from "./can-scene";
 import { cans, CAN_CENTER_INDEX } from "@/lib/cans-data";
 
 const EASE = [0.32, 0.72, 0, 1] as const;
+const PIXELS_PER_INDEX = 150;
+const AUTOPLAY_DELAY = 4200;
+const CLICK_THRESHOLD = 6;
+const MOMENTUM_PROJECTION_MS = 140;
+const MAX_VELOCITY = 2.2;
+
+type DragState = {
+  startX: number;
+  startOffset: number;
+  lastX: number;
+  lastTime: number;
+  velocity: number;
+};
 
 export function CanCarousel() {
   const [focusIndex, setFocusIndex] = useState(CAN_CENTER_INDEX);
   const offsetRef = useRef(CAN_CENTER_INDEX);
-  const dragState = useRef<{ startX: number; dragging: boolean } | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragState = useRef<DragState | null>(null);
+  const autoplayTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goTo = useCallback((index: number) => {
     setFocusIndex(Math.max(0, Math.min(cans.length - 1, index)));
   }, []);
 
+  const scheduleAutoplay = useCallback(() => {
+    if (autoplayTimer.current) clearTimeout(autoplayTimer.current);
+    autoplayTimer.current = setTimeout(() => {
+      setFocusIndex((i) => (i >= cans.length - 1 ? 0 : i + 1));
+    }, AUTOPLAY_DELAY);
+  }, []);
+
+  useEffect(() => {
+    scheduleAutoplay();
+    return () => {
+      if (autoplayTimer.current) clearTimeout(autoplayTimer.current);
+    };
+  }, [focusIndex, scheduleAutoplay]);
+
   const handlePointerDown = useCallback((event: React.PointerEvent) => {
-    dragState.current = { startX: event.clientX, dragging: true };
+    if (autoplayTimer.current) clearTimeout(autoplayTimer.current);
+    isDraggingRef.current = true;
+    dragState.current = {
+      startX: event.clientX,
+      startOffset: offsetRef.current,
+      lastX: event.clientX,
+      lastTime: performance.now(),
+      velocity: 0,
+    };
     (event.target as Element).setPointerCapture?.(event.pointerId);
   }, []);
 
-  const handlePointerMove = useCallback(() => {
-    // Live visual feedback is handled by the damped spring in CanScene;
-    // precise index change happens on release for predictable snapping.
+  const handlePointerMove = useCallback((event: React.PointerEvent) => {
+    const drag = dragState.current;
+    if (!drag || !isDraggingRef.current) return;
+
+    const now = performance.now();
+    const dt = Math.max(now - drag.lastTime, 1);
+    drag.velocity = (event.clientX - drag.lastX) / dt;
+    drag.lastX = event.clientX;
+    drag.lastTime = now;
+
+    const totalDeltaX = event.clientX - drag.startX;
+    const liveOffset = drag.startOffset - totalDeltaX / PIXELS_PER_INDEX;
+    offsetRef.current = THREE.MathUtils.clamp(liveOffset, 0, cans.length - 1);
   }, []);
 
   const handlePointerUp = useCallback(
     (event: React.PointerEvent) => {
       const drag = dragState.current;
-      if (!drag) return;
-      const deltaX = event.clientX - drag.startX;
       dragState.current = null;
-      if (Math.abs(deltaX) < 40) return;
-      goTo(focusIndex + (deltaX < 0 ? 1 : -1));
+      if (!drag) return;
+
+      const totalDeltaX = event.clientX - drag.startX;
+
+      if (Math.abs(totalDeltaX) < CLICK_THRESHOLD) {
+        isDraggingRef.current = false;
+        scheduleAutoplay();
+        return;
+      }
+
+      const clampedVelocity = THREE.MathUtils.clamp(drag.velocity, -MAX_VELOCITY, MAX_VELOCITY);
+      const projected =
+        offsetRef.current - (clampedVelocity * MOMENTUM_PROJECTION_MS) / PIXELS_PER_INDEX;
+      const nearest = Math.round(
+        THREE.MathUtils.clamp(projected, 0, cans.length - 1),
+      );
+
+      isDraggingRef.current = false;
+      goTo(nearest);
     },
-    [focusIndex, goTo],
+    [goTo, scheduleAutoplay],
   );
 
   const handleKeyDown = useCallback(
@@ -60,14 +123,19 @@ export function CanCarousel() {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className="relative h-[360px] w-full cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[440px] lg:h-[480px]"
+        className="relative h-[420px] w-full cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[500px] lg:h-[580px]"
       >
         <Canvas
-          camera={{ position: [0, 0.15, 7.2], fov: 40 }}
+          camera={{ position: [0, 0.15, 7.8], fov: 40 }}
           gl={{ antialias: true, alpha: true }}
           dpr={[1, 2]}
         >
-          <CanScene focusIndex={focusIndex} offsetRef={offsetRef} onSelect={goTo} />
+          <CanScene
+            focusIndex={focusIndex}
+            offsetRef={offsetRef}
+            isDraggingRef={isDraggingRef}
+            onSelect={goTo}
+          />
         </Canvas>
 
         <button

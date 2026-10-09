@@ -3,7 +3,7 @@ import { InstagramLogo } from "@phosphor-icons/react/dist/ssr";
 export function Footer() {
   return (
     <footer className="border-t border-border px-4 py-12">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:justify-between sm:text-left">
+      <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:justify-between sm:text-left">
         <div>
           <p className="font-script text-2xl leading-none text-gold">Medicus</p>
           <p className="mt-2 text-sm text-foreground-faint">

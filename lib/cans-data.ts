@@ -10,6 +10,26 @@ export type CanEntry = {
 
 export const cans: CanEntry[] = [
   {
+    id: "pomelo-del-puerto",
+    name: "Pomelo del Puerto",
+    era: "circa 1950",
+    description:
+      "Unloaded off a cargo ship in 1950, the can that started the whole shelf tradition without anyone planning it.",
+    labelColor: "#c97b6a",
+    metalColor: "#a89484",
+    rimColor: "#e8b64a",
+  },
+  {
+    id: "malta-dorada",
+    name: "Malta Dorada",
+    era: "circa 1955",
+    description:
+      "A malt tonic regulars swore cured hangovers. Nobody's tested that claim since the seventies.",
+    labelColor: "#7a4a1f",
+    metalColor: "#9c8a6e",
+    rimColor: "#e8b64a",
+  },
+  {
     id: "gaseosa-del-che",
     name: "Gaseosa del Che",
     era: "circa 1958",
@@ -40,6 +60,16 @@ export const cans: CanEntry[] = [
     rimColor: "#e8b64a",
   },
   {
+    id: "sifon-real",
+    name: "Sifón Real",
+    era: "circa 1968",
+    description:
+      "Bottled two blocks from the old waterworks, back when the siphon man still made house calls.",
+    labelColor: "#4a6670",
+    metalColor: "#b0b8ba",
+    rimColor: "#f3ead9",
+  },
+  {
     id: "soda-negra",
     name: "Soda Negra",
     era: "circa 1973",
@@ -50,6 +80,16 @@ export const cans: CanEntry[] = [
     rimColor: "#d97736",
   },
   {
+    id: "anana-fizz",
+    name: "Ananá Fizz",
+    era: "circa 1977",
+    description:
+      "A pineapple soda that showed up for one summer and never officially left the menu.",
+    labelColor: "#e0a52e",
+    metalColor: "#b8a574",
+    rimColor: "#5a3a26",
+  },
+  {
     id: "cola-imperial",
     name: "Cola Imperial",
     era: "circa 1978",
@@ -58,6 +98,16 @@ export const cans: CanEntry[] = [
     labelColor: "#b23a2e",
     metalColor: "#b7a98f",
     rimColor: "#f3ead9",
+  },
+  {
+    id: "cola-negra-especial",
+    name: "Cola Negra Especial",
+    era: "circa 1982",
+    description:
+      "The short-run cola Medicus bottled under its own label for exactly one season in 1982.",
+    labelColor: "#1c1410",
+    metalColor: "#6e645a",
+    rimColor: "#b23a2e",
   },
   {
     id: "naranja-dorada",
@@ -90,6 +140,16 @@ export const cans: CanEntry[] = [
     rimColor: "#2e4a4a",
   },
   {
+    id: "frutilla-brava",
+    name: "Frutilla Brava",
+    era: "circa 1996",
+    description:
+      "Named by a regular's daughter who still comes in every birthday to check it's still there.",
+    labelColor: "#a3274a",
+    metalColor: "#a8948e",
+    rimColor: "#e8b64a",
+  },
+  {
     id: "pomelo-bravo",
     name: "Pomelo Bravo",
     era: "circa 2001",
@@ -99,6 +159,26 @@ export const cans: CanEntry[] = [
     metalColor: "#a8988e",
     rimColor: "#e8b64a",
   },
+  {
+    id: "agua-serrana",
+    name: "Agua Serrana",
+    era: "circa 2005",
+    description:
+      "Kept for the handful of regulars who order it straight, no ice, same glass every time.",
+    labelColor: "#7f9a9c",
+    metalColor: "#b7bdbb",
+    rimColor: "#2e4a4a",
+  },
+  {
+    id: "ale-del-fondo",
+    name: "Ale del Fondo",
+    era: "circa 2010",
+    description:
+      "The newest can on the shelf, home brewed by a regular who finally got the carbonation right.",
+    labelColor: "#8a5222",
+    metalColor: "#a8906c",
+    rimColor: "#d97736",
+  },
 ];
 
-export const CAN_CENTER_INDEX = 4;
+export const CAN_CENTER_INDEX = 8;

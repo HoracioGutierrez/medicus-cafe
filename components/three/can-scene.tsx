@@ -9,16 +9,20 @@ import { cans } from "@/lib/cans-data";
 export function CanScene({
   focusIndex,
   offsetRef,
+  isDraggingRef,
   onSelect,
 }: {
   focusIndex: number;
   offsetRef: MutableRefObject<number>;
+  isDraggingRef: MutableRefObject<boolean>;
   onSelect: (index: number) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state, delta) => {
-    offsetRef.current = THREE.MathUtils.damp(offsetRef.current, focusIndex, 5.2, delta);
+    if (!isDraggingRef.current) {
+      offsetRef.current = THREE.MathUtils.damp(offsetRef.current, focusIndex, 5.2, delta);
+    }
     if (groupRef.current) {
       groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.3) * 0.01;
     }

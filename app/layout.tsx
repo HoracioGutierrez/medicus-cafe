@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope, Geist_Mono, Pinyon_Script } from "next/font/google";
+import { Playfair_Display, Manrope, Geist_Mono, Pinyon_Script } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700"],
   style: ["normal", "italic"],
 });
 
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${pinyonScript.variable} h-full antialiased`}
+      className={`${playfairDisplay.variable} ${manrope.variable} ${geistMono.variable} ${pinyonScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <a
