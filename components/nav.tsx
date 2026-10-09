@@ -29,19 +29,19 @@ export function Nav() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
-          {LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-foreground-muted transition-colors duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-foreground"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
+        <div className="flex items-center gap-10">
+          <div className="hidden items-center gap-8 md:flex">
+            {LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-foreground-muted transition-colors duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

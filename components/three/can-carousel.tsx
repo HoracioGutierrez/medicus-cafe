@@ -30,14 +30,19 @@ export function CanCarousel() {
   const dragState = useRef<DragState | null>(null);
   const autoplayTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const goTo = useCallback((index: number) => {
-    setFocusIndex(Math.max(0, Math.min(cans.length - 1, index)));
+  const goTo = useCallback((targetIndex: number) => {
+    setFocusIndex((current) => {
+      const n = cans.length;
+      let delta = ((targetIndex - current) % n + n) % n;
+      if (delta > n / 2) delta -= n;
+      return current + delta;
+    });
   }, []);
 
   const scheduleAutoplay = useCallback(() => {
     if (autoplayTimer.current) clearTimeout(autoplayTimer.current);
     autoplayTimer.current = setTimeout(() => {
-      setFocusIndex((i) => (i >= cans.length - 1 ? 0 : i + 1));
+      setFocusIndex((i) => i + 1);
     }, AUTOPLAY_DELAY);
   }, []);
 
@@ -72,8 +77,7 @@ export function CanCarousel() {
     drag.lastTime = now;
 
     const totalDeltaX = event.clientX - drag.startX;
-    const liveOffset = drag.startOffset - totalDeltaX / PIXELS_PER_INDEX;
-    offsetRef.current = THREE.MathUtils.clamp(liveOffset, 0, cans.length - 1);
+    offsetRef.current = drag.startOffset - totalDeltaX / PIXELS_PER_INDEX;
   }, []);
 
   const handlePointerUp = useCallback(
@@ -93,12 +97,10 @@ export function CanCarousel() {
       const clampedVelocity = THREE.MathUtils.clamp(drag.velocity, -MAX_VELOCITY, MAX_VELOCITY);
       const projected =
         offsetRef.current - (clampedVelocity * MOMENTUM_PROJECTION_MS) / PIXELS_PER_INDEX;
-      const nearest = Math.round(
-        THREE.MathUtils.clamp(projected, 0, cans.length - 1),
-      );
+      const nearest = Math.round(projected);
 
       isDraggingRef.current = false;
-      goTo(nearest);
+      setFocusIndex(nearest);
     },
     [goTo, scheduleAutoplay],
   );
@@ -111,7 +113,11 @@ export function CanCarousel() {
     [focusIndex, goTo],
   );
 
-  const current = useMemo(() => cans[focusIndex], [focusIndex]);
+  const wrappedIndex = useMemo(() => {
+    const n = cans.length;
+    return ((Math.round(focusIndex) % n) + n) % n;
+  }, [focusIndex]);
+  const current = useMemo(() => cans[wrappedIndex], [wrappedIndex]);
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -141,18 +147,16 @@ export function CanCarousel() {
         <button
           type="button"
           onClick={() => goTo(focusIndex - 1)}
-          disabled={focusIndex === 0}
           aria-label="Previous can"
-          className="absolute top-1/2 left-0 -translate-y-1/2 rounded-full p-2 text-foreground-faint/70 opacity-60 backdrop-blur-sm transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-background-raised/50 hover:text-foreground hover:opacity-100 active:scale-90 disabled:opacity-0"
+          className="absolute top-1/2 left-0 -translate-y-1/2 rounded-full p-2 text-foreground-faint/70 opacity-60 backdrop-blur-sm transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-background-raised/50 hover:text-foreground hover:opacity-100 active:scale-90"
         >
           <CaretLeft size={18} weight="regular" />
         </button>
         <button
           type="button"
           onClick={() => goTo(focusIndex + 1)}
-          disabled={focusIndex === cans.length - 1}
           aria-label="Next can"
-          className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full p-2 text-foreground-faint/70 opacity-60 backdrop-blur-sm transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-background-raised/50 hover:text-foreground hover:opacity-100 active:scale-90 disabled:opacity-0"
+          className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full p-2 text-foreground-faint/70 opacity-60 backdrop-blur-sm transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-background-raised/50 hover:text-foreground hover:opacity-100 active:scale-90"
         >
           <CaretRight size={18} weight="regular" />
         </button>
@@ -165,9 +169,9 @@ export function CanCarousel() {
             type="button"
             onClick={() => goTo(index)}
             aria-label={`Go to ${can.name}`}
-            aria-current={index === focusIndex}
+            aria-current={index === wrappedIndex}
             className={`h-1.5 rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              index === focusIndex ? "w-6 bg-ember-bright" : "w-1.5 bg-border hover:bg-foreground-faint"
+              index === wrappedIndex ? "w-6 bg-ember-bright" : "w-1.5 bg-border hover:bg-foreground-faint"
             }`}
           />
         ))}

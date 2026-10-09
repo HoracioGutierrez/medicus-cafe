@@ -61,25 +61,35 @@ const GROUPS = [
 export function Faq() {
   return (
     <section id="faq" className="px-4 py-28 sm:py-36">
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-2xl">
         <Reveal>
-          <h2 className="max-w-[560px] text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          <h2 className="text-center text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Questions before you come by
           </h2>
         </Reveal>
 
-        <div className="mt-16 flex flex-col gap-16">
+        <div className="mt-16 flex flex-col gap-14">
           {GROUPS.map((group, groupIndex) => (
             <Reveal key={group.label} delay={groupIndex * 0.08}>
-              <div className="border-t border-border pt-6">
-                <span className="font-serif text-lg text-gold italic">{group.label}</span>
-                <div className="mt-6 grid grid-cols-1 gap-x-16 gap-y-10 md:grid-cols-2">
+              <div>
+                <div className="flex items-center gap-4">
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="text-xs font-medium tracking-[0.25em] text-gold uppercase">
+                    {group.label}
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="mt-8 flex flex-col gap-7">
                   {group.items.map((item) => (
                     <div key={item.question}>
-                      <h3 className="text-base font-medium text-foreground">
-                        {item.question}
-                      </h3>
-                      <p className="mt-2 max-w-[48ch] text-sm leading-6 text-foreground-muted">
+                      <div className="flex items-baseline gap-3">
+                        <h3 className="font-serif text-lg text-foreground">
+                          {item.question}
+                        </h3>
+                        <span className="h-px flex-1 border-b border-dotted border-foreground-faint/30" />
+                      </div>
+                      <p className="mt-2 font-serif text-[15px] leading-6 text-foreground-muted italic">
                         {item.answer}
                       </p>
                     </div>

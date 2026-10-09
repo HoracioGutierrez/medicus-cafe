@@ -5,7 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { getCanGeometry } from "./can-geometry";
 import "./can-material";
-import type { CanEntry } from "@/lib/cans-data";
+import { cans, type CanEntry } from "@/lib/cans-data";
 
 const SPACING = 1.6;
 const BACKGROUND_COLOR = new THREE.Color("#131209");
@@ -35,7 +35,12 @@ export function CanMesh({
     const material = materialRef.current;
     if (!mesh || !material) return;
 
-    const distance = index - offsetRef.current;
+    // Shortest signed distance around the cycle, so the shelf wraps
+    // seamlessly instead of sweeping back across every can on loop.
+    const n = cans.length;
+    const rawDistance = index - offsetRef.current;
+    let distance = ((rawDistance % n) + n) % n;
+    if (distance > n / 2) distance -= n;
     const absDistance = Math.abs(distance);
 
     const scale = THREE.MathUtils.clamp(1.85 - absDistance * 0.5, 0.2, 1.85);
