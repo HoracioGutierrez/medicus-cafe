@@ -1,7 +1,7 @@
 export function IntroSection() {
   return (
-    <section className="chapter chapter--intro" data-slot="intro-section">
-      <h1 className="display display--intro">
+    <section className="chapter chapter--intro" data-slot="intro-section" data-chapter="intro">
+      <h1 className="display display--intro" data-reveal="intro">
         <span className="display__line" data-depth="0.06">
           MISMA ESTANTERÍA
         </span>

@@ -36,6 +36,11 @@ export function useSodaShelfScene(sodas: Soda[]) {
     const carouselDescription = document.querySelector<HTMLElement>(
       "[data-carousel-description]",
     );
+    const chapterSections = document.querySelectorAll<HTMLElement>("[data-chapter]");
+    const revealTargets = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const backdropLayers = document.querySelectorAll<HTMLElement>(
+      "[data-chapter-backdrop]",
+    );
     if (
       !canvas ||
       !boot ||
@@ -375,6 +380,53 @@ export function useSodaShelfScene(sodas: Soda[]) {
     const easeInOut = (t: number) =>
       t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
+    // Each chapter's own [start, end) window of the page's total scroll
+    // range, measured from actual layout so it stays correct regardless of
+    // viewport size or content changes. Chapters are contiguous, so one
+    // chapter's end is simply the next chapter's start — that shared
+    // boundary point is where its crossfade window is centered, which is
+    // what makes the outgoing and incoming chapter overlap symmetrically
+    // instead of both bottoming out right at the handoff.
+    const REVEAL_CROSSFADE = 0.025;
+    const BACKDROP_CROSSFADE = 0.05;
+    const REVEAL_DISTANCE_REM = 1.75;
+
+    let chapterRanges: Record<string, { start: number; end: number }> = {};
+
+    function measureChapters() {
+      const total = document.documentElement.scrollHeight - innerHeight;
+      if (total <= 0) return;
+      const measured = Array.from(chapterSections)
+        .map((section) => ({ chapter: section.dataset.chapter, start: section.offsetTop / total }))
+        .filter((entry): entry is { chapter: string; start: number } => Boolean(entry.chapter))
+        .sort((a, b) => a.start - b.start);
+
+      const next: typeof chapterRanges = {};
+      measured.forEach((entry, index) => {
+        const end = index < measured.length - 1 ? measured[index + 1].start : 1;
+        next[entry.chapter] = { start: entry.start, end };
+      });
+      chapterRanges = next;
+    }
+
+    function chapterPresence(
+      chapter: string | undefined,
+      progress: number,
+      crossfade: number,
+      { skipEntryFade = false, skipExitFade = false } = {},
+    ) {
+      if (!chapter) return 0;
+      const range = chapterRanges[chapter];
+      if (!range) return 0;
+      const fadeIn = skipEntryFade
+        ? 1
+        : smoothstep(range.start - crossfade, range.start + crossfade, progress);
+      const fadeOut = skipExitFade
+        ? 1
+        : 1 - smoothstep(range.end - crossfade, range.end + crossfade, progress);
+      return clamp(Math.min(fadeIn, fadeOut));
+    }
+
     const bgStops = [
       { at: 0, color: [7, 9, 9] },
       { at: 0.34, color: [8, 17, 12] },
@@ -588,6 +640,7 @@ export function useSodaShelfScene(sodas: Soda[]) {
       camera.fov = innerWidth < 760 ? 42 : 32;
       camera.position.z = innerWidth < 760 ? 15 : 14;
       camera.updateProjectionMatrix();
+      measureChapters();
     }
 
     const syncSelectedCan = () => {
@@ -718,6 +771,36 @@ export function useSodaShelfScene(sodas: Soda[]) {
     addEventListener("scroll", updateScroll, { passive: true });
     addEventListener("resize", resize);
     updateScroll();
+    measureChapters();
+
+    function updateChapterEffects() {
+      backdropLayers.forEach((layer) => {
+        const presence = chapterPresence(
+          layer.dataset.chapterBackdrop,
+          scrollCurrent,
+          BACKDROP_CROSSFADE,
+          {
+            skipEntryFade: layer.dataset.chapterBackdrop === "intro",
+            skipExitFade: layer.dataset.chapterBackdrop === "finale",
+          },
+        );
+        layer.style.opacity = String(presence);
+      });
+
+      revealTargets.forEach((el) => {
+        if (reducedMotion) {
+          el.style.opacity = "1";
+          el.style.translate = "none";
+          return;
+        }
+        const presence = chapterPresence(el.dataset.reveal, scrollCurrent, REVEAL_CROSSFADE, {
+          skipEntryFade: el.dataset.reveal === "intro",
+          skipExitFade: el.dataset.reveal === "finale",
+        });
+        el.style.opacity = String(presence);
+        el.style.translate = `0 ${(1 - presence) * REVEAL_DISTANCE_REM}rem`;
+      });
+    }
 
     function render() {
       if (disposed) return;
@@ -730,6 +813,7 @@ export function useSodaShelfScene(sodas: Soda[]) {
       syncSelectedCan();
 
       updateDOM(scrollCurrent);
+      updateChapterEffects();
       cans.forEach((can, index) => setCanPose(can, index, scrollCurrent, time));
 
       world.rotation.y = Math.sin(time * 0.28) * 0.015;

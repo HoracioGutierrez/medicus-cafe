@@ -2,6 +2,7 @@
 
 import { sodas, CAROUSEL_ORIGIN } from "@/lib/sodas";
 import { useSodaShelfScene } from "./use-soda-shelf-scene";
+import { SceneBackdrop } from "./scene-backdrop";
 import { SkipLink } from "./skip-link";
 import { BootScreen } from "./boot-screen";
 import { SiteHeader } from "./site-header";
@@ -20,6 +21,7 @@ export function SodaShelf() {
     <>
       <SkipLink />
       <BootScreen />
+      <SceneBackdrop />
       <canvas className="webgl" />
       <SiteHeader />
       <CarouselControls initialSoda={sodas[CAROUSEL_ORIGIN]} />

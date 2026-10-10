@@ -75,11 +75,6 @@
     min-width: 320px;
     overflow-x: hidden;
     background-color: rgb(var(--scene-r), var(--scene-g), var(--scene-b));
-    background-image: url("/backgrounds/bg-1.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
     transition: background-color 80ms linear;
   }
 
@@ -215,6 +210,26 @@
       animation: none;
       transition: none;
     }
+  }
+
+  .scene-backdrop {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+  }
+
+  .scene-backdrop__layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+  }
+
+  /* Shows something before the scene engine takes over opacity each frame. */
+  .scene-backdrop__layer:first-child {
+    opacity: 1;
   }
 
   .webgl {
@@ -531,9 +546,15 @@
     text-shadow: var(--shadow-lg);
   }
 
-  /* Shared spacing for the description paragraph under a section's title. */
+  /* Shared spacing for the description paragraphs under a section's title. */
   .chapter-description {
     margin: 2.5rem 0 0;
+  }
+
+  /* A second (or later) description paragraph sits closer to the one above
+     it than the title does, since it's continuing the same thought. */
+  .chapter-description + .chapter-description {
+    margin-top: 1rem;
   }
 
   .burst-description {
