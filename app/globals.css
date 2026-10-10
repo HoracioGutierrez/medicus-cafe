@@ -559,8 +559,13 @@ noscript {
   .display--intro {
     top: 17vh;
     width: calc(100vw - 2.5rem);
-    font-size: clamp(4.2rem, 20vw, 7rem);
-    line-height: 0.78;
+    font-size: clamp(2.5rem, 12.5vw, 5.5rem);
+    line-height: 0.92;
+  }
+
+  .display__line {
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .display__line:last-child {
@@ -602,7 +607,9 @@ noscript {
   }
 
   .display--focus {
-    font-size: clamp(4.25rem, 20vw, 7rem);
+    font-size: clamp(2.5rem, 12.5vw, 5.5rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .chapter--burst {
@@ -611,7 +618,9 @@ noscript {
   }
 
   .burst-title {
-    font-size: clamp(4.1rem, 19vw, 7rem);
+    font-size: clamp(2.4rem, 12vw, 5.5rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .burst-title span:last-child {
@@ -628,7 +637,9 @@ noscript {
   }
 
   .finale-copy h2 {
-    font-size: clamp(4.3rem, 20vw, 7rem);
+    font-size: clamp(2.5rem, 12.5vw, 5.5rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .progress {
