@@ -381,42 +381,54 @@ export function useSodaShelfScene(sodas: Soda[]) {
       t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     // Each chapter's own [start, end) window of the page's total scroll
-    // range, measured from actual layout so it stays correct regardless of
-    // viewport size or content changes. Chapters are contiguous, so one
-    // chapter's end is simply the next chapter's start — that shared
-    // boundary point is where its crossfade window is centered, which is
-    // what makes the outgoing and incoming chapter overlap symmetrically
-    // instead of both bottoming out right at the handoff.
+    // range. Chapters are contiguous, so one chapter's end is simply the
+    // next chapter's start — that shared boundary point is where its
+    // crossfade window is centered, which is what makes the outgoing and
+    // incoming chapter overlap symmetrically instead of both bottoming out
+    // right at the handoff.
+    //
+    // Offsets are stored as raw pixels and converted to progress fractions
+    // on demand using the *current* total scroll range (see
+    // chapterRangesNow), rather than baking in a fraction computed once at
+    // measurement time. Mobile browsers resize the viewport as their
+    // address bar collapses/expands while scrolling, which changes
+    // `innerHeight` — and therefore the total — mid-session. scrollTarget
+    // (in updateScroll) always divides by the live total, so if chapter
+    // boundaries used a stale one instead, the two would drift apart and
+    // the reveal/crossfade would never reach full presence on mobile.
     const REVEAL_CROSSFADE = 0.025;
     const BACKDROP_CROSSFADE = 0.05;
     const REVEAL_DISTANCE_REM = 1.75;
 
-    let chapterRanges: Record<string, { start: number; end: number }> = {};
+    let chapterOffsets: { chapter: string; top: number }[] = [];
 
     function measureChapters() {
-      const total = document.documentElement.scrollHeight - innerHeight;
-      if (total <= 0) return;
-      const measured = Array.from(chapterSections)
-        .map((section) => ({ chapter: section.dataset.chapter, start: section.offsetTop / total }))
-        .filter((entry): entry is { chapter: string; start: number } => Boolean(entry.chapter))
-        .sort((a, b) => a.start - b.start);
+      chapterOffsets = Array.from(chapterSections)
+        .map((section) => ({ chapter: section.dataset.chapter, top: section.offsetTop }))
+        .filter((entry): entry is { chapter: string; top: number } => Boolean(entry.chapter))
+        .sort((a, b) => a.top - b.top);
+    }
 
-      const next: typeof chapterRanges = {};
-      measured.forEach((entry, index) => {
-        const end = index < measured.length - 1 ? measured[index + 1].start : 1;
-        next[entry.chapter] = { start: entry.start, end };
+    function chapterRangesNow(total: number) {
+      const ranges: Record<string, { start: number; end: number }> = {};
+      chapterOffsets.forEach((entry, index) => {
+        const start = entry.top / total;
+        const end =
+          index < chapterOffsets.length - 1 ? chapterOffsets[index + 1].top / total : 1;
+        ranges[entry.chapter] = { start, end };
       });
-      chapterRanges = next;
+      return ranges;
     }
 
     function chapterPresence(
+      ranges: Record<string, { start: number; end: number }>,
       chapter: string | undefined,
       progress: number,
       crossfade: number,
       { skipEntryFade = false, skipExitFade = false } = {},
     ) {
       if (!chapter) return 0;
-      const range = chapterRanges[chapter];
+      const range = ranges[chapter];
       if (!range) return 0;
       const fadeIn = skipEntryFade
         ? 1
@@ -774,8 +786,13 @@ export function useSodaShelfScene(sodas: Soda[]) {
     measureChapters();
 
     function updateChapterEffects() {
+      const total = document.documentElement.scrollHeight - innerHeight;
+      if (total <= 0) return;
+      const ranges = chapterRangesNow(total);
+
       backdropLayers.forEach((layer) => {
         const presence = chapterPresence(
+          ranges,
           layer.dataset.chapterBackdrop,
           scrollCurrent,
           BACKDROP_CROSSFADE,
@@ -793,7 +810,7 @@ export function useSodaShelfScene(sodas: Soda[]) {
           el.style.translate = "none";
           return;
         }
-        const presence = chapterPresence(el.dataset.reveal, scrollCurrent, REVEAL_CROSSFADE, {
+        const presence = chapterPresence(ranges, el.dataset.reveal, scrollCurrent, REVEAL_CROSSFADE, {
           skipEntryFade: el.dataset.reveal === "intro",
           skipExitFade: el.dataset.reveal === "finale",
         });
