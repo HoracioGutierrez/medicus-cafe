@@ -488,7 +488,7 @@
 
   .display--focus {
     margin: 2rem 0;
-    font-size: clamp(4.75rem, 10vw, 10rem);
+    font-size: clamp(3.325rem, 7vw, 7rem);
   }
 
   .display--focus em {
@@ -510,7 +510,7 @@
 
   .burst-title {
     margin: 0;
-    font-size: clamp(5rem, 14vw, 14rem);
+    font-size: clamp(3.5rem, 9.8vw, 9.8rem);
     font-weight: 800;
     line-height: 0.67;
     letter-spacing: -0.07em;
@@ -531,6 +531,15 @@
     text-shadow: var(--shadow-lg);
   }
 
+  /* Shared spacing for the description paragraph under a section's title. */
+  .chapter-description {
+    margin: 2.5rem 0 0;
+  }
+
+  .burst-description {
+    max-width: 28rem;
+  }
+
   .chapter--finale {
     display: flex;
     min-height: 150vh;
@@ -546,7 +555,7 @@
 
   .finale-copy h2 {
     margin: 0;
-    font-size: clamp(5rem, 12vw, 12rem);
+    font-size: clamp(3.5rem, 8.4vw, 8.4rem);
     font-weight: 800;
     line-height: 0.72;
     letter-spacing: -0.07em;
@@ -695,7 +704,12 @@
       margin-left: 0;
     }
 
-    .display--focus,
+    .display--focus {
+      font-size: clamp(1.75rem, 8.75vw, 3.85rem);
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
     .display--error {
       font-size: clamp(2.5rem, 12.5vw, 5.5rem);
       overflow-wrap: break-word;
@@ -708,7 +722,7 @@
     }
 
     .burst-title {
-      font-size: clamp(2.4rem, 12vw, 5.5rem);
+      font-size: clamp(1.68rem, 8.4vw, 3.85rem);
       overflow-wrap: break-word;
       word-break: break-word;
     }
@@ -727,7 +741,7 @@
     }
 
     .finale-copy h2 {
-      font-size: clamp(2.5rem, 12.5vw, 5.5rem);
+      font-size: clamp(1.75rem, 8.75vw, 3.85rem);
       overflow-wrap: break-word;
       word-break: break-word;
     }

@@ -7,7 +7,7 @@ export function FocusSection() {
           <br />
           <em>leé la etiqueta</em>
         </h2>
-        <p>
+        <p className="chapter-description">
           Cada lata de esta estantería lleva más tiempo acá que muchos
           parroquianos en su mesa de siempre. Dale una vuelta — los
           ingredientes no cambiaron desde el día que llegó.
