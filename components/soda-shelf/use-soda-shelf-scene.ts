@@ -1,87 +1,23 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
+import { CAROUSEL_ORIGIN, type Soda } from "@/lib/sodas";
 
-const palette = [
-  {
-    name: "COCA-COLA",
-    label: "Coca-Cola",
-    era: "circa 1960",
-    description: "La primera que llegó al mostrador, con la receta de siempre.",
-    calories: "140",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
-    texture: "brands/coca-cola.jpg",
-  },
-  {
-    name: "7UP",
-    label: "7UP",
-    era: "circa 1965",
-    description: "La de las tardes de domingo sin fútbol por la radio.",
-    calories: "140",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CITRIC ACID · LEMON AND LIME FLAVORS",
-    texture: "brands/7up.jpg",
-  },
-  {
-    name: "DR-PEPPER",
-    label: "Dr Pepper",
-    era: "circa 1970",
-    description: "La trajo un marinero y nunca volvió a buscarla.",
-    calories: "150",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
-    texture: "brands/dr-pepper.jpg",
-  },
-  {
-    name: "SPRITE",
-    label: "Sprite",
-    era: "circa 1972",
-    description: "La que pide todo el que jura que no toma gaseosa.",
-    calories: "140",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CITRIC ACID · NATURAL LEMON-LIME FLAVORS",
-    texture: "brands/sprite.jpg",
-  },
-  {
-    name: "FANTA",
-    label: "Fanta",
-    era: "circa 1975",
-    description: "Naranja como el atardecer que se ve desde la vereda.",
-    calories: "160",
-    ingredients:
-      "CARBONATED WATER · SUGAR · ORANGE JUICE · CITRIC ACID · NATURAL FLAVORS",
-    texture: "brands/fanta.jpg",
-  },
-  {
-    name: "PEPSI",
-    label: "Pepsi",
-    era: "circa 1980",
-    description: "La eterna segunda opción, aunque acá nadie discute gustos.",
-    calories: "150",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CARAMEL COLOR · NATURAL FLAVORS · CAFFEINE",
-    texture: "brands/pepsi.jpg",
-  },
-  {
-    name: "MTN-DEW",
-    label: "Mtn Dew",
-    era: "circa 1985",
-    description: "Llegó con los pibes del rock y se quedó para siempre.",
-    calories: "170",
-    ingredients:
-      "CARBONATED WATER · SUGAR · CITRUS FLAVOR · NATURAL FLAVORS · CAFFEINE",
-    texture: "brands/mtn-dew.jpg",
-  },
-];
-
-const CAROUSEL_ORIGIN = 3;
-
-export function HomeScene() {
+/**
+ * Drives the entire WebGL soda-shelf experience: the can carousel, the
+ * scroll-scrubbed camera/lighting choreography, and the DOM chrome that
+ * reacts to it (boot screen, carousel labels, scroll progress rail).
+ *
+ * This stays imperative and queries the DOM by stable class/data attributes
+ * rather than refs, because it orchestrates a dozen+ elements spread across
+ * several sibling components with a single shared animation clock — passing
+ * that many refs through props would add indirection without a real benefit
+ * here, since the DOM structure never changes after mount.
+ */
+export function useSodaShelfScene(sodas: Soda[]) {
   useEffect(() => {
     let disposed = false;
 
@@ -199,7 +135,7 @@ export function HomeScene() {
 
     const assetPath = (path: string) => `/${path.replace(/^\/+/, "")}`;
 
-    const CAROUSEL_MIN = CAROUSEL_ORIGIN - (palette.length - 1);
+    const CAROUSEL_MIN = CAROUSEL_ORIGIN - (sodas.length - 1);
     const CAROUSEL_MAX = CAROUSEL_ORIGIN;
 
     const textureLoader = new THREE.TextureLoader();
@@ -232,7 +168,7 @@ export function HomeScene() {
       });
     }
 
-    function drawIngredientsPanel(ctx: CanvasRenderingContext2D, flavor: (typeof palette)[number]) {
+    function drawIngredientsPanel(ctx: CanvasRenderingContext2D, flavor: Soda) {
       const { x, y, width, height } = INGREDIENTS_PANEL;
       const inset = 10;
 
@@ -300,7 +236,7 @@ export function HomeScene() {
       ctx.restore();
     }
 
-    function loadSleeveTexture(flavor: (typeof palette)[number]) {
+    function loadSleeveTexture(flavor: Soda) {
       const label = document.createElement("canvas");
       label.width = 1024;
       label.height = 512;
@@ -324,7 +260,7 @@ export function HomeScene() {
       return texture;
     }
 
-    function buildCan(source: THREE.Object3D, flavor: (typeof palette)[number], index: number) {
+    function buildCan(source: THREE.Object3D, flavor: Soda, index: number) {
       const can = new THREE.Group();
       can.name = `can-${flavor.name.toLowerCase()}`;
 
@@ -486,7 +422,7 @@ export function HomeScene() {
       assetPath("models/soda-can.glb"),
       ({ scene: source }) => {
         if (disposed) return;
-        cans = palette.map((flavor, index) => buildCan(source, flavor, index));
+        cans = sodas.map((flavor, index) => buildCan(source, flavor, index));
         cans.forEach((can) => world.add(can));
         requestAnimationFrame(() => boot.classList.add("is-ready"));
       },
@@ -628,7 +564,7 @@ export function HomeScene() {
         const direction = Number(button.dataset.carouselDirection);
         const atBoundary =
           (direction > 0 && selectedIndex === 0) ||
-          (direction < 0 && selectedIndex === palette.length - 1);
+          (direction < 0 && selectedIndex === sodas.length - 1);
         button.disabled = !carouselIsActive || atBoundary;
         button.tabIndex = carouselIsActive && !atBoundary ? 0 : -1;
       });
@@ -658,13 +594,13 @@ export function HomeScene() {
       const nextIndex = clamp(
         CAROUSEL_ORIGIN - Math.round(carouselTarget),
         0,
-        palette.length - 1,
+        sodas.length - 1,
       );
       if (nextIndex === selectedIndex) return;
       selectedIndex = nextIndex;
-      carouselCurrentLabel.textContent = palette[selectedIndex].label;
-      carouselEra.textContent = palette[selectedIndex].era;
-      carouselDescription.textContent = palette[selectedIndex].description;
+      carouselCurrentLabel.textContent = sodas[selectedIndex].label;
+      carouselEra.textContent = sodas[selectedIndex].era;
+      carouselDescription.textContent = sodas[selectedIndex].description;
     };
 
     function updateCarousel(direction: number) {
@@ -913,124 +849,6 @@ export function HomeScene() {
       });
       renderer.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  return (
-    <>
-      <a href="#main-content" className="skip-link">
-        Saltar al contenido
-      </a>
-
-      <div className="boot">
-        <p className="boot__mark">MEDICUS</p>
-        <div className="boot__line" />
-      </div>
-
-      <canvas className="webgl" />
-
-      <header className="site-header">
-        <Link href="/" className="wordmark">
-          MEDICUS<span>.</span>
-        </Link>
-      </header>
-
-      <div className="carousel-controls">
-        <button
-          type="button"
-          className="carousel-control carousel-control--previous"
-          data-carousel-direction="1"
-          aria-label="Lata anterior"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          className="carousel-control carousel-control--next"
-          data-carousel-direction="-1"
-          aria-label="Lata siguiente"
-        >
-          ›
-        </button>
-        <p className="carousel-hint">
-          <i aria-hidden="true" />
-          <span className="carousel-meta">
-            <span className="carousel-current" data-carousel-current>
-              {palette[CAROUSEL_ORIGIN].label}
-            </span>
-            <span className="carousel-era" data-carousel-era>
-              {palette[CAROUSEL_ORIGIN].era}
-            </span>
-          </span>
-        </p>
-        <p className="carousel-description" data-carousel-description>
-          {palette[CAROUSEL_ORIGIN].description}
-        </p>
-      </div>
-
-      <main id="main-content">
-        <section className="chapter chapter--intro">
-          <h1 className="display display--intro">
-            <span className="display__line" data-depth="0.06">
-              MISMA ESTANTERÍA
-            </span>
-            <span className="display__line display__line--italic" data-depth="-0.04">
-              las mismas historias
-            </span>
-          </h1>
-        </section>
-
-        <section className="chapter chapter--focus">
-          <div className="focus-copy">
-            <h2 className="display display--focus">
-              MIRÁ DE CERCA
-              <br />
-              <em>leé la etiqueta</em>
-            </h2>
-            <p>
-              Cada lata de esta estantería lleva más tiempo acá que muchos
-              parroquianos en su mesa de siempre. Dale una vuelta — los
-              ingredientes no cambiaron desde el día que llegó.
-            </p>
-          </div>
-        </section>
-
-        <section className="chapter chapter--burst">
-          <h2 className="burst-title">
-            <span>SIGUEN FRÍAS</span>
-            <span>siguen acá</span>
-          </h2>
-        </section>
-
-        <section className="chapter chapter--finale">
-          <div className="finale-copy">
-            <h2>
-              VISITÁ LA <span className="text-clay">ESTANTERÍA</span>
-            </h2>
-            <p>
-              Abrimos desde las siete de la mañana hasta que se apaga la
-              última luz. Vení, sentate con nosotros, y escuchá alguna de
-              estas historias con un cafecito en la mano.
-            </p>
-          </div>
-        </section>
-      </main>
-
-      <div className="progress" aria-hidden="true">
-        <div className="progress__rail">
-          <i />
-        </div>
-      </div>
-
-      <footer>
-        <div className="footer-brand">
-          <p>MEDICUS — DESDE 1962</p>
-          <p>UNA ESTANTERÍA DE HISTORIAS</p>
-        </div>
-        <div className="footer-contact">
-          <p>AV. BOEDO 1138 · BOEDO, CABA</p>
-          <p>+54 11 4931-0627 · LUN A DOM 7 A 1 HS</p>
-        </div>
-      </footer>
-    </>
-  );
 }

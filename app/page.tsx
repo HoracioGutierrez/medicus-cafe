@@ -1,5 +1,5 @@
-import { HomeScene } from "@/components/home-scene";
+import { SodaShelf } from "@/components/soda-shelf";
 
 export default function Home() {
-  return <HomeScene />;
+  return <SodaShelf />;
 }
