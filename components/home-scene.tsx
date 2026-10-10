@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
@@ -916,6 +917,10 @@ export function HomeScene() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Saltar al contenido
+      </a>
+
       <div className="boot">
         <p className="boot__mark">MEDICUS</p>
         <div className="boot__line" />
@@ -924,9 +929,9 @@ export function HomeScene() {
       <canvas className="webgl" />
 
       <header className="site-header">
-        <a href="#" className="wordmark">
+        <Link href="/" className="wordmark">
           MEDICUS<span>.</span>
-        </a>
+        </Link>
       </header>
 
       <div className="carousel-controls">
@@ -962,7 +967,7 @@ export function HomeScene() {
         </p>
       </div>
 
-      <main>
+      <main id="main-content">
         <section className="chapter chapter--intro">
           <h1 className="display display--intro">
             <span className="display__line" data-depth="0.06">
@@ -1017,8 +1022,14 @@ export function HomeScene() {
       </div>
 
       <footer>
-        <p>MEDICUS — DESDE 1962</p>
-        <p className="footer-credit">UNA ESTANTERÍA DE HISTORIAS</p>
+        <div className="footer-brand">
+          <p>MEDICUS — DESDE 1962</p>
+          <p>UNA ESTANTERÍA DE HISTORIAS</p>
+        </div>
+        <div className="footer-contact">
+          <p>AV. BOEDO 1138 · BOEDO, CABA</p>
+          <p>+54 11 4931-0627 · LUN A DOM 7 A 1 HS</p>
+        </div>
       </footer>
     </>
   );
