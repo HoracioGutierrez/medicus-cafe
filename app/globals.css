@@ -717,7 +717,8 @@
 
     .chapter--focus {
       align-items: flex-start;
-      padding-top: 25vh;
+      min-height: 105vh;
+      padding-top: 12vh;
     }
 
     .focus-copy {
@@ -739,7 +740,8 @@
 
     .chapter--burst {
       justify-content: flex-start;
-      padding-top: 33vh;
+      min-height: 95vh;
+      padding-top: 16vh;
     }
 
     .burst-title {
@@ -754,7 +756,9 @@
 
     .chapter--finale {
       align-items: flex-start;
-      padding-top: 25vh;
+      min-height: 110vh;
+      padding-top: 12vh;
+      padding-bottom: 8vh;
     }
 
     .finale-copy {
